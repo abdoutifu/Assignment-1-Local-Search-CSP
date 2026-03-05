@@ -6,10 +6,41 @@ from pycsp3 import *
 def solve_minesweeper(clues: list[list[int]]) -> list[(int, int)]:
     clear()
 
-    # TODO
+# 1 : Problem formulation    
+    #variables : each cells
+    #domains : -1, 1, 2, 3, 4, 5, 6, 7, 8
+    #constraints : x_i, y_j = k>0, then 
+    #for a, b in [-1,0,1] with i=j=0 impossible
+    # x_(i+a), y(i+b)
+    #we have k cells = -1
+    
+    def select_unassigned_values(csp,assignement)-> ??:
+        return var
+    
+    def order_domain_values(var,assignement) -> ?? : 
+        return values
+    
+    def inference(csp,var,assignement):
+        return inferences
 
+    #Search algorithm
+    def backtrack(csp,assignement)-> list[(int, int)]:
+        if len(assignement)==len(clues[0])*len(clues):
+            return assignement
+        var = select_unassigned_values(csp,assignement)
+        for value in order_domain_values(var, assignement):
+            if consistant(value,assignement):
+                assignement.append(value)
+                inferences = inference(csp,var,assignement)
+                if inferences != None:
+                    csp.append(inferences)
+                    result = backtrack(csp, assignement)
+                    if result != None:
+                        return result
+                    csp.remove(inferences)
+                assignement.remove(value)
+        return None
     return None
-
 
 def check_solution(clues: list[list[int]], solution: list[(int, int)]) -> bool:
     n = len(clues)
