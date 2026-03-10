@@ -14,12 +14,56 @@ def solve_minesweeper(clues: list[list[int]]) -> list[(int, int)]:
     # x_(i+a), y(i+b)
     #we have k cells = -1
     
-    def select_unassigned_values(csp,assignement)-> ??:
-        return var
+    def enough_mines(cell, csp): #cell = [x,y]
+        mines = 0
+        for dx in [-1,0,1]:
+            for dy in [-1,0,1]:
+                if not (dx==0 and dy ==0):
+                    if csp[cell[1]+dy][cell[0]+dx]==-1:
+                        mines+=1
+        return mines == csp[cell[1]][cell[0]]
     
-    def order_domain_values(var,assignement) -> ?? : 
+    def neighboor_numbers(cell,csp):
+        nb = 0
+        for dx in [-1,0,1]:
+            for dy in [-1,0,1]:
+                if not (dx==0 and dy ==0):
+                    neighboor = csp[cell[1]+dy][cell[0]+dx]
+                    if type(neighboor)==int and neighboor>0:
+                        nb+= neighboor
+        return nb
+        
+    
+    #How do we define a cell with the most constraint ?
+    def select_unassigned_values(csp,assignement)-> [int,int]: 
+        #we return the best next cell to study
+        var = [-1,-1]
+        most_numbers = -1
+        
+        for y in range(len(csp)):
+            for x in range(len(csp[0])):
+
+                if csp[y][x] == " ":
+                    for dx in [-1,0,1]:
+                        for dy in [-1,0,1]:
+                            if not (dx==0 and dy ==0):
+                                if (x+dx)>0 and (x+dx)<len(csp[0]) and (y+dy)>0 and (y+dy)<len(csp):
+                                    if enough_mines([x+dx,y+dy], csp):
+                                        return [x,y]
+                    local_number = neighboor_numbers([x,y], csp)
+                    if most_numbers<  local_number:
+                        most_numbers = local_number
+                        var = [x,y]                                                     
+        return var
+    #think about the use of assignement
+    def order_domain_values(csp,var,assignement):
+        #We return the list of all possible values in a specific order
+        #We need to find how to organise these data
+        if enough_mines(var,  csp):
+            
         return values
     
+    #we try to get less possible values for a cell
     def inference(csp,var,assignement):
         return inferences
 
@@ -28,7 +72,7 @@ def solve_minesweeper(clues: list[list[int]]) -> list[(int, int)]:
         if len(assignement)==len(clues[0])*len(clues):
             return assignement
         var = select_unassigned_values(csp,assignement)
-        for value in order_domain_values(var, assignement):
+        for value in order_domain_values(csp,var, assignement):
             if consistant(value,assignement):
                 assignement.append(value)
                 inferences = inference(csp,var,assignement)
