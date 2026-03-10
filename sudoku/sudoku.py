@@ -18,9 +18,13 @@ def solve_sudoku(clues):
 
     # constraint 4
     [x[i][j] == clues[i][j] for i in range(9) for j in range(9) if clues and clues[i][j] > 0],
-
-    # ADD YOUR SUPPLEMENTARY CONSTRAINT HERE
-    
+    # ADD YOUR SUPPLEMENTARY CONSTRAINTS HERE
+    # supplementary constraint: the centers of each suqare 3*3 must be different
+    [AllDifferent([
+            x[1][1], x[1][4], x[1][7],
+            x[4][1], x[4][4], x[4][7],
+            x[7][1], x[7][4], x[7][7]
+        ])]    
     )
 
     # Solve the problem and print the solution if found
