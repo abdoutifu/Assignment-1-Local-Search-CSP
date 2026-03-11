@@ -1,43 +1,34 @@
-import sys
-import os
-import importlib.util
 from pycsp3 import *
-# 1. THE NUCLEAR IMPORT (Keep this, it fixed your environment!)
-env_path = r'C:\Users\matth\minesweeper_env\Lib\site-packages'
-if env_path not in sys.path:
-    sys.path.insert(0, env_path)
-
-try:
-    from pycsp3 import *
-    
-except ModuleNotFoundError:
-    spec = importlib.util.spec_from_file_location("pycsp3", os.path.join(env_path, "pycsp3", "__init__.py"))
-    pycsp3 = importlib.util.module_from_spec(spec)
-    sys.modules["pycsp3"] = pycsp3
-    spec.loader.exec_module(pycsp3)
-    from pycsp3 import *
-
-
 def solve_minesweeper(clues: list[list[int]]) -> list:
     clear() #we clear prior variables and constraints
     length, width = len(clues), len(clues[0])
-    assignements = VarArray(size=[length, width], dom={0, 1})
-    #an array of the dimensions of the map with the domain {0 : a mine, 1 : not a mine}
-    
+    assignements = VarArray(size=[length, width], dom={0,1})
+    #an array of the dimensions of the map with the domain {0 : not a mine, 1 : a mine}
+    priority_queue = [] #we add from the backtracking method
+    #the select-unassigned-variable function using a list
     for i in range(length):
         for j in range(width):
-            if clues[i][j] != -1:#if the cell is not already an identified mine
+            priority_queue.append([clues[i][j],i,j])
+    priority_queue.sort(key=lambda x: x[0],reverse=True)
+    #our method for sorting is to get the cell with the most constraint
+    #meaning the highest number
+    
+    for k in range(len(priority_queue)):
+        local_clue = priority_queue[k][0]
+        i = priority_queue[k][1]
+        j = priority_queue[k][2]
+        if local_clue != -1:#if the cell has a clue
+                neighbours = []
+                
+                for di in [-1,0,1]:
+                    for dj in [-1,0,1]:
+                        if (di != 0 or dj != 0) and 0 <= i+di < length and 0 <= j+dj < width:
+                                neighbours.append(assignements[i+di][j+dj])
+                satisfy(Sum(neighbours) == local_clue)
+                #after gathering all the neighbours the constrain is to say
+                #that the sum of all values (which is 0 for not a mine and 1 for a mine
+                #around are equal to the number written on the middle cell if its not a mine
                 satisfy(assignements[i][j] == 0)
-                #the first constrain is to say that the cell is not a mine
-                neighbors = []
-                for dx in [-1,0,1]:
-                    for dy in [-1,0,1]:
-                        if (dx != 0 or dy != 0) and 0 <= i+dx < length and 0 <= j+dy < width:
-                                neighbors.append(assignements[i+dx][j+dy])
-                satisfy(Sum(neighbors) == clues[i][j])
-                #after gathering all the neighbors the 2nd constrain is to say
-                #that the sum of all values around are equal to the number written on 
-                #the middle cell if its not a mine
     
     if solve() is SAT:
         return [(x, y) for x in range(length) for y in range(width) if value(assignements[x][y]) == 1]
