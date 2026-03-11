@@ -2,8 +2,8 @@
 \usepackage{marvosym}
 
 \assignment{1}
-\group{...}
-\students{..........}{..........}
+\group{G095}
+\students{Couvreur Matthieu}{Benbada Abdellatif}
 
 \begin{document}
 
@@ -38,6 +38,11 @@ The size of the boxes indicate the place you \textbf{can} use, but you \textbf{n
 \end{enumerate}
 
 \begin{answers}[10cm]
+    \item Variables of the model : \\
+    In the backtracking algorithm, we need an assignment variable, the name is the same in the program. Here we create an Array $assignements$ of the size of the map with 2 possible domains : {0 : not a mine, 1 : a mine}. $neighbours$ represent the neighbours of the studied cell around. 
+    \item Constraints of the CP model : The constraints are applied to the grid configuration, we will say if the cell should be a mine (value = 1) or not (value = 0).As stated in the rules of minesweeper, the number written in the studied cell must be equal to the number of mines around it. This is why we are making a loop to get every neighbour of the cell so we can make the 1st constraint. The constraint is written here with $Sum(neighbours) == clues[i][j]$ that we implement with the $satisfy$ function given by pycsp3 thanks to the bibliography. In order to put constraints by using the clues, we first need to check if the cell has a clue to give (cell[i][j]!=-1 means that its not an empty cell). Then if we have a clue to study, we already know that the cell is not a mine, we can already put it as a constraint $assignements[i][j] == 0$. 
+    \item Solving : 
+    After filling $assignements$, we check if its solved or not thanks to pycps3 functions, if not it will return None. If the problem is solved, we go through the $assignements$ and take each cell who is a mine (value = 1) in a form of a tuple just as asked in the subject.
     % Your answer here
 \end{answers}
 
