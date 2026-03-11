@@ -1,6 +1,21 @@
-"""NAMES OF THE AUTHOR(S): Alice Burlats <alice.burlats@uclouvain.be>"""
-
+import sys
+import os
+import importlib.util
 from pycsp3 import *
+# 1. THE NUCLEAR IMPORT (Keep this, it fixed your environment!)
+env_path = r'C:\Users\matth\minesweeper_env\Lib\site-packages'
+if env_path not in sys.path:
+    sys.path.insert(0, env_path)
+
+try:
+    from pycsp3 import *
+    
+except ModuleNotFoundError:
+    spec = importlib.util.spec_from_file_location("pycsp3", os.path.join(env_path, "pycsp3", "__init__.py"))
+    pycsp3 = importlib.util.module_from_spec(spec)
+    sys.modules["pycsp3"] = pycsp3
+    spec.loader.exec_module(pycsp3)
+    from pycsp3 import *
 
 
 def solve_minesweeper(clues: list[list[int]]) -> list:
@@ -14,13 +29,13 @@ def solve_minesweeper(clues: list[list[int]]) -> list:
             if clues[i][j] != -1:#if the cell is not already an identified mine
                 satisfy(assignements[i][j] == 0)
                 #the first constrain is to say that the cell is not a mine
-                neighboors = []
+                neighbors = []
                 for dx in [-1,0,1]:
                     for dy in [-1,0,1]:
                         if (dx != 0 or dy != 0) and 0 <= i+dx < length and 0 <= j+dy < width:
-                                neighboors.append(assignements[i+dx][j+dy])
-                satisfy(Sum(neighboors) == clues[i][j])
-                #after gathering all the neighboors the 2nd constrain is to say
+                                neighbors.append(assignements[i+dx][j+dy])
+                satisfy(Sum(neighbors) == clues[i][j])
+                #after gathering all the neighbors the 2nd constrain is to say
                 #that the sum of all values around are equal to the number written on 
                 #the middle cell if its not a mine
     
@@ -28,7 +43,6 @@ def solve_minesweeper(clues: list[list[int]]) -> list:
         return [(x, y) for x in range(length) for y in range(width) if value(assignements[x][y]) == 1]
     #if in the end map we have a mine, we save that value in the list as a tuple of its coordinates
     return None
-
 
 def check_solution(clues: list[list[int]], solution: list[(int, int)]) -> bool:
     n = len(clues)
@@ -66,7 +80,7 @@ def parse_instance(input_file: str) -> list[list[int]]:
 
 
 if __name__ == '__main__':
-    clues = parse_instance("instances/sat/i01.txt")
+    clues = parse_instance("instances/unsat/i03.txt")
     solution = solve_minesweeper(clues)
     if solution is not None:
         if check_solution(clues, solution):
